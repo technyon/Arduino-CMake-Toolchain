@@ -22,11 +22,32 @@ foreach(idx RANGE "${_last_index}")
 
 	# Grep for the size in the output and add them all together
 	set(tot_size 0)
+
+	# Use ripgrep if available because native CMake regexes don't support some
+	# features that are used by some boards (namely arduino UNO R4)
+	execute_process(
+		COMMAND which rg
+		RESULT_VARIABLE ripgrep_unavailable
+		# We set OUTPUT_VARIABLE, just so the output is not echoed to the user
+		OUTPUT_VARIABLE ignored
+	)
+
 	foreach(line IN LISTS SizeRecipeOutput)
-    	string(REGEX MATCH "${size_regex}" match "${line}")
-	    if (match)
-    	    math(EXPR tot_size "${tot_size} + ${CMAKE_MATCH_${size_match_idx}}")
-    	endif()
+		if (ripgrep_unavailable)
+			string(REGEX MATCH "${size_regex}" match "${line}")
+			if (match)
+				math(EXPR tot_size "${tot_size} + ${CMAKE_MATCH_${size_match_idx}}")
+			endif()
+		else()
+			execute_process(
+				COMMAND echo "${line}"
+				COMMAND rg -P "${size_regex}" -or $2
+				OUTPUT_VARIABLE match_output
+			)
+			if (match_output)
+				math(EXPR tot_size "${tot_size} + ${match_output}")
+			endif()
+		endif()
 	endforeach()
 
 
