@@ -166,6 +166,12 @@ Workaround: Rename the library folder to the include name and use include name i
 
 Resolution: Please try with release-1.1-dev branch.
 
+**4. Calculating firmware size fails with message about invalid regex**
+
+CMake regular expressions don't support some features that are used by some boards (namely arduino UNO R4) for calculating the firmware size.
+
+Workaround: Install [ripgrep](https://github.com/BurntSushi/ripgrep). The toolchain will use `rg` command instead of native CMake regular expressions if available.
+
 ## How it works
 
 This toolchain follows the build process described in [Arduino Build Process](https://arduino.github.io/arduino-cli/sketch-build-process/), and processes the JSON, platform.txt and boards.txt files correponding to the Arduino platform as specified in the documentation [Arduino IDE 1.5 3rd party Hardware specification](https://arduino.github.io/arduino-cli/platform-specification/).
