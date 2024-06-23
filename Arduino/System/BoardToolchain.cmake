@@ -102,6 +102,7 @@ function (SetupBoardToolchain)
 	if (EXISTS "${ARDUINO_INSTALL_PATH}/lib/version.txt")
 		file(READ "${ARDUINO_INSTALL_PATH}/lib/version.txt" _version)
                 string(STRIP "${_version}" _version)
+		string(REGEX REPLACE "^([0-9.]+).*" "\\1" _version "${_version}")  # added to truncate "1.8.19+dfsg1-1" to "1.8.19"
 		if(_version)
 			set(_path "${ARDUINO_INSTALL_PATH}")
 			string(REPLACE "." "0" _version "${_version}")
