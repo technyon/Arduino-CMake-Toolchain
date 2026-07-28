@@ -104,11 +104,25 @@ function(InitializeArduinoPackagePathList)
 			NO_CMAKE_FIND_ROOT_PATH
 			DOC "Path to Arduino IDE installation")
 	# message("ARDUINO_INSTALL_PATH:${ARDUINO_INSTALL_PATH}")
+
+	# Search for Arduino package path (do this before the IDE check so an
+	# existing arduino-cli installation can bypass the IDE requirement)
+	find_path(ARDUINO_PACKAGE_PATH
+			NAMES package_index.json
+			PATH_SUFFIXES ${package_path_suffixes}
+			HINTS ${package_search_paths}
+			NO_DEFAULT_PATH
+			NO_CMAKE_FIND_ROOT_PATH
+			DOC "Path to Arduino platform packages")
+	# message("ARDUINO_PACKAGE_PATH:${ARDUINO_PACKAGE_PATH}")
+
 	if (NOT ARDUINO_INSTALL_PATH AND NOT "${ARDUINO_ENABLE_PACKAGE_MANAGER}"
-		AND "${ARDUINO_BOARD_MANAGER_URL}" STREQUAL "")
+		AND "${ARDUINO_BOARD_MANAGER_URL}" STREQUAL ""
+		AND NOT ARDUINO_PACKAGE_PATH)
 		message(FATAL_ERROR "Arduino IDE installation is not found!!!\n"
 			"Use -DARDUINO_INSTALL_PATH=<path> to manually specify the path (OR)\n"
-			"Use -DARDUINO_BOARD_MANAGER_URL=<board_url> to try downloading\n")
+			"Use -DARDUINO_BOARD_MANAGER_URL=<board_url> to try downloading (OR)\n"
+			"Install packages via arduino-cli and set -DARDUINO_PACKAGE_PATH=<path>\n")
 	elseif(ARDUINO_INSTALL_PATH AND NOT "${ARDUINO_ENABLE_PACKAGE_MANAGER}"
         AND "${ARDUINO_BOARD_MANAGER_URL}" STREQUAL "")
 		message("${ARDUINO_INSTALL_PATH}")
@@ -119,16 +133,6 @@ function(InitializeArduinoPackagePathList)
 				"${_version}. Please install newer version!")
 		endif()
 	endif()
-
-	# Search for Arduino library path
-	find_path(ARDUINO_PACKAGE_PATH
-			NAMES package_index.json
-			PATH_SUFFIXES ${package_path_suffixes}
-			HINTS ${package_search_paths}
-			NO_DEFAULT_PATH
-			NO_CMAKE_FIND_ROOT_PATH
-			DOC "Path to Arduino platform packages")
-	# message("ARDUINO_PACKAGE_PATH:${ARDUINO_PACKAGE_PATH}")
 
 	# Search for sketchbook path
 	find_file(ARDUINO_PREFERENCE_FILE
