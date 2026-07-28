@@ -1,6 +1,6 @@
 # Copyright (c) 2020 Arduino CMake Toolchain
 
-cmake_policy(VERSION 3.1)
+cmake_policy(VERSION 3.10)
 
 # Generated content based on the selected board
 set(ARDUINO_TOOLCHAIN_DIR "@ARDUINO_TOOLCHAIN_DIR@")
